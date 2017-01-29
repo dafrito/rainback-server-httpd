@@ -1,0 +1,515 @@
+/* Make the document be the size of the screen. */
+html, body {
+    padding: 0;
+    margin: 0;
+    height: 100%;
+}
+
+body {
+    text-align: center;
+}
+
+/* Ensure the tops of columns are aligned, not the bottoms. */
+.column, .sidebar, .content {
+    vertical-align: top;
+}
+
+.bodyContent {
+    box-sizing: border-box;
+    padding-top: 0.6em;
+}
+
+.header {
+    padding-top: .5em;
+    padding-bottom: .5em;
+    text-align: center;
+    box-sizing: border-box;
+    background-color: #134144;
+    width: 100%;
+}
+
+.header input {
+    float: right;
+    display: inline-block;
+    height: 1.8em;
+    font-size: 1em;
+    padding: 0 .2em;
+    box-sizing: border-box;
+    border: 1px solid #15595D;
+    background: #0F656B none repeat scroll 0% 0%;
+    color: #FAFFFF;
+    margin-right: .5em;
+    width: 20em;
+}
+
+.header ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0
+}
+
+button,
+.header li {
+    display: inline-block;
+    background: #534900 none repeat scroll 0% 0%;
+    border-radius: 0.2em;
+    color: #F0DC3C;
+    line-height: 1.5em;
+}
+
+.header li {
+    padding: 0 .6em;
+    padding-top: .25em;
+    border-radius: 0;
+}
+
+.header .selected {
+    background-color: #096C7A;
+}
+
+.header .unselected {
+    color: #AEA76C;
+    background-color: #134144;
+}
+
+.column, .sidebar, .content {
+    text-align: left;
+    box-sizing: border-box;
+    padding-left: 1%;
+    padding-right: 1%;
+    display: inline-block;
+    overflow-y: auto;
+    height: 100%;
+    width: 25%;
+}
+
+.sidebar {
+    padding-top: .5em;
+    background-color: rgb(56, 18, 49);
+}
+
+.content {
+    width: 46.6%;
+    padding-left: 1%;
+    padding-right: 1%;
+    box-sizing: border-box;
+}
+
+.content > div {
+    padding-bottom: .25em;
+}
+
+section {
+    padding: .5em;
+    box-sizing: border-box;
+    width: 100%;
+    border-radius: 2px;
+    margin-top: .25em;
+}
+
+.menu {
+    margin-top: 1em;
+}
+
+.menu {
+    text-align: center;
+    color: #CFBACE;
+    background-color: #3F253D;
+    padding: .5em;
+    box-sizing: border-box;
+    border-radius: 2px;
+}
+
+body {
+    font-size: 18px;
+    font-family: sans-serif, Liberation Sans, Arial;
+}
+
+body {
+    background-color: #121A3B;
+    color: #81AADB;
+}
+
+button.visual {
+    padding: .1em .3em;
+    width: 100%;
+    box-sizing: border-box;
+    opacity: .8;
+}
+
+select, input, textarea, button {
+    font-size: 18px;
+    font-family: sans-serif;
+    padding: .4em;
+    margin: .15em 0;
+}
+
+select, button, input[type~=text], input[type~=password], input[type~=button], input[type~=submit], textarea {
+    box-sizing: border-box;
+    border: 0;
+    padding: .4em;
+    border-radius: .1em;
+    margin-right: .2em;
+}
+
+select, input[type~=text], input[type~=password], textarea {
+    width: 100%;
+    background: rgb(34, 69, 131) none repeat scroll 0% 0%;
+    color: #ccc;
+}
+
+.listItem select, .listItem input[type~=text], .listItem input[type~=password], .listItem textarea {
+    background: #34326B;
+}
+
+textarea {
+    width: 100%;
+    height: 20em;
+}
+
+#footer {
+    opacity: 0.1;
+}
+
+pre {
+    overflow: scroll;
+}
+
+input {
+    outline: none;
+}
+
+a {
+    color: #CB6BD7;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: normal;
+    margin: 0;
+    padding: .5em 0;
+    color: rgb(181, 191, 204);
+}
+
+h4, h5, h6 {
+    font-weight: normal;
+}
+
+.pillLabel, .pillField {
+    display:inline-block;
+}
+
+.pill {
+    border: 3px solid rgb(34, 69, 131);
+    border-radius: 3px;
+    margin: .1em 0;
+    width: 32em;
+    background: rgb(34, 69, 131) none repeat scroll 0% 0%;
+}
+
+.pillLabel {
+    color: #7F9ECE;
+    padding: .2em .3em;
+    text-align: right;
+    vertical-align: top;
+    width: 30%;
+    box-sizing: border-box;
+}
+
+.pillField {
+    border-radius: 3px;
+    border-top-left-radius: 1px;
+    border-bottom-left-radius: 1px;
+    background:  #325993;
+    color: rgb(196, 218, 224);
+    padding: .2em .3em;
+    width: 70%;
+    box-sizing: border-box;
+}
+
+.timestamp {
+    color: #7291B1;
+    font-weight: normal;
+}
+
+div.note:first-of-type {
+}
+
+div.noteContent p:first-of-type {
+    margin-top: .2em;
+}
+
+div.noteContent p:last-of-type {
+    margin-bottom: .2em;
+}
+
+div.noteContent {
+    padding-bottom: 1em;
+}
+
+button.submit, input[type~=button], input[type~=submit] {
+    background: #780078 none repeat scroll 0% 0%;
+    width: 100%;
+    border: 0;
+    border-radius: .1em;
+    color: #DADADA;
+    padding: .4em .6em;
+    margin-bottom: .3em;
+    margin-top: .3em;
+}
+
+.listItem button.submit, .listItem input[type~=button], .listItem input[type~=submit] {
+    background: #553271 none repeat scroll 0% 0%;
+    color: #DACFF3;
+}
+
+label {
+    display: inline-block;
+}
+
+span.label {
+    display: inline-block;
+    padding-right: .5em;
+}
+
+button {
+    font-size: .9em;
+}
+
+button.submit {
+    font-size: 1em;
+}
+
+.listItem {
+    border-radius: 6px;
+    margin-top: .3em;
+    margin-bottom: .3em;
+    color: #9298C3;
+}
+
+.listTitle {
+    padding-left: .4em;
+    padding-right: .4em;
+    border-radius: 6px;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+    background: #42326F none repeat scroll 0% 0%;
+    color: #BCC1E4;
+}
+
+.listTitle .closeButton {
+    float: right;
+    font-size: .8em;
+    line-height: 1.5em;
+    background:  #715915;
+    border-radius: 4px;
+    padding: .1em .5em;
+    color: #F0DC3C;
+}
+
+.listBody {
+    padding: .5em;
+    padding-top: .5em;
+    border-radius: 6px;
+    border-top-right-radius: 0;
+    border-top-left-radius: 0;
+    background: rgb(37, 38, 80) none repeat scroll 0% 0%;
+    color: #9298C3;
+    border: 2px solid #42326F;
+    border-top: none;
+}
+
+.listItem label {
+    #A3A4D2;
+}
+
+button {
+    display: inline-block;
+    margin-right: .1em;
+}
+
+#pageSource {
+    height: 20em;
+}
+
+.marlaPage-pageSource, #marlaPageSource {
+    width: 99%;
+    height: 20em;
+}
+
+#pageContent {
+    width: 32em;
+}
+
+#marlaPageContent, #marlaPageEditing {
+    width: 60em;
+}
+
+#marlaPageContent {
+    margin-bottom: 1em;
+}
+
+#doppler {
+    position: relative;
+    clear: left;
+}
+
+#doppler > img {
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+.calendar {
+}
+
+.calendar-header {
+    text-align: center;
+}
+
+.month {
+    line-height: 1.5em;
+    margin-top: 0;
+    color: #F5F5F5;
+}
+
+.calendar-header .day, .calendar .day {
+    display: inline-block;
+    width: 14.2857%;
+    text-align: center;
+    color: #7A487B;
+}
+
+.calendar-header  {
+    color: #B88FB9;
+}
+
+.calendar .day {
+    display: inline-block;
+    width: 14.2857%;
+    line-height: 2em;
+    text-align: center;
+    box-sizing: border-box;
+    background-color: #471B45;
+    border: 2px solid #471B45;
+    color: #e3e3e3;
+}
+
+.calendar .empty {
+    border: none;
+}
+
+.calendar .this-week {
+    background-color: rgb(27, 35, 71);
+}
+
+.calendar .today {
+    color: white;
+    background-color: #5B295C;
+}
+
+.calendar .selectedDay {
+    color: white;
+    background-color: #663360;
+    border: 2px solid #88a;
+}
+
+.calendar .out-of-month {
+    color: #526B8A;
+    background-color: transparent;
+}
+
+@media only screen and (max-width: 800px) {
+
+.column, .sidebar, .content {
+    width: 99.6%;
+    margin-bottom: .5em;
+}
+
+button,
+.selection > li {
+    display: block;
+}
+
+label {
+    margin-top: .8em;
+}
+
+label:first-of-type {
+    margin-top: 0;
+}
+
+label {
+    width: 100%;
+    display: block;
+    text-align: left;
+}
+
+select, button, textarea, input[type~=text], input[type~=password], input[type~=button], input[type~=submit] {
+    width: 100%;
+}
+
+button, input[type~=button], input[type~=submit] {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+select, input[type~=button], input[type~=submit] {
+    -webkit-appearance: none;
+    border-radius: .1em;
+}
+
+.pill {
+    width: 100%;
+    box-sizing: border-box;
+    border: 2px solid rgb(34, 69, 131);
+}
+
+.pillLabel {
+    display: block;
+    width: 100%;
+    text-align: left;
+}
+
+.pillField {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+    display: block;
+    width: 100%;
+}
+
+textarea {
+    height: 8em;
+    width: 100%;
+}
+
+#doppler > img {
+    width: 100%;
+}
+
+#marlaPageContent {
+    width: 100%;
+}
+
+#marlaPageEditing, #marlaPageSource {
+    width: 100%;
+}
+
+#marlaPageSource {
+    height: 20em;
+}
+
+.commandField {
+    box-sizing: border-box;
+    width: 70% !important;
+}
+
+.commandButton {
+    box-sizing: border-box;
+    width: 25% !important;
+}
+
+} /* media query */
+
