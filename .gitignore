@@ -3,3 +3,4 @@ error_log
 httpd.conf
 actual.html
 httpd.pid
+mod_*.so
