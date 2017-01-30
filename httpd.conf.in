@@ -444,51 +444,16 @@ AddDefaultCharset UTF-8
 #EnableMMAP off
 EnableSendfile on
 
-LoadModule form_module modules/mod_form.so
-LoadModule mod_parsegraph_theme mod_parsegraph_theme.so
-
-LoadModule mod_parsegraph_website_list mod_parsegraph_website_list.so
-<LocationMatch "^/website/?$">
-SetHandler mod_parsegraph_website_list
-SetOutputFilter mod_parsegraph_theme
-</LocationMatch>
-
-LoadModule mod_parsegraph_website_content mod_parsegraph_website_content.so
-<LocationMatch "^/website/(?<website>[0-9a-zA-Z-_.]+)/?$">
-SetHandler mod_parsegraph_website_content
-SetOutputFilter mod_parsegraph_theme
-</LocationMatch>
-
 DBDriver sqlite3
 DBDParams /home/dafrito/var/parsegraph/users.sqlite
 
 DBDPrepareSQL "SELECT username, email from user" ListUsers
-
-DBDPrepareSQL "INSERT INTO user(username, password, password_salt) VALUES(%s, %pDb, %pDb)" InsertUser
+DBDPrepareSQL "INSERT INTO user(username, password, password_salt) VALUES(%s, %s, %s)" InsertUser
 DBDPrepareSQL "SELECT id, password, password_salt from user where username = %s" HasUser
-DBDPrepareSQL "INSERT INTO login(user_id, selector, token) VALUES(%d, %s, %s)" BeginUserLogin
+DBDPrepareSQL "INSERT INTO login(username, selector, token) VALUES(%d, %s, %s)" BeginUserLogin
 
-LoadModule parsegraph_user_list_module mod_parsegraph_user_list.so
-<LocationMatch "^/user/?$">
-FormPOST On
-SetHandler parsegraph_user_list
-SetOutputFilter mod_parsegraph_theme
-</LocationMatch>
-
-LoadModule parsegraph_user_content_module mod_parsegraph_user_content.so
-<LocationMatch "^/user/(?<username>[0-9a-zA-Z-_.]+)/?$">
-SetHandler parsegraph_user_content
-SetOutputFilter mod_parsegraph_theme
-</LocationMatch>
-
-LoadModule parsegraph_login_list_module mod_parsegraph_login_list.so
-<LocationMatch "^/user/(?<username>[0-9a-zA-Z-_.]+)/login/?$">
-SetHandler parsegraph_login_list
-SetOutputFilter mod_parsegraph_theme
-</LocationMatch>
-
-LoadModule parsegraph_login_content_module mod_parsegraph_login_content.so
-<LocationMatch "^/user/(?<username>[0-9a-zA-Z-_.]+)/login/(?<login_id>[0-9a-z]+)/?$">
-SetHandler parsegraph_login_content
-SetOutputFilter mod_parsegraph_theme
+LoadFile /home/dafrito/src/parsegraph/parsegraph_login/src/.libs/libparsegraph_login.so
+LoadModule parsegraph_login_json_module /home/dafrito/src/parsegraph/parsegraph_server/mod_parsegraph_login_json.so
+<LocationMatch "^/login/?$">
+SetHandler parsegraph_login_json
 </LocationMatch>
