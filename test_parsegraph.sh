@@ -11,15 +11,16 @@ test -e modules || die "The Apache modules directory must be symlinked for testi
 test -d www || mkdir www
 test -d www || die "The www directory could not be created and does not exist."
 
-install_users() {
+login_install() {
     local install_path=$*
+    mkdir -p `dirname $install_path`
     if test -e $install_path; then
         return;
     fi
-    PARSEGRAPH_INSTALL_USERS=`pkg-config --variable=parsegraph_install_users parsegraph_common`
-    test -z $PARSEGRAPH_INSTALL_USERS && die "No install script was found"
+    PARSEGRAPH_LOGIN_INSTALL=`pkg-config --variable=parsegraph_login_install parsegraph_common`
+    test -z $PARSEGRAPH_LOGIN_INSTALL && die "No install script was found"
     ! test -e $install_path || die "Install database must not already exist"
-    $PARSEGRAPH_INSTALL_USERS sqlite3 $install_path || die "Install script failed"
+    $PARSEGRAPH_LOGIN_INSTALL sqlite3 $install_path || die "Install script failed"
     test -e $install_path || die "Installed database was not created."
 }
 
@@ -65,9 +66,8 @@ check_method_path() {
 # Run all tests.
 test_server() {
     check_method_path GET '/'
-    check_method_path GET '/user'
-    check_method_path GET '/website'
+    check_method_path GET '/login'
 }
 
-install_users $HOME/var/parsegraph/users.sqlite
+login_install $HOME/var/parsegraph/users.sqlite
 test_server
