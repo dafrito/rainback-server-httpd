@@ -451,6 +451,7 @@ DBDPrepareSQL "SELECT username, email from user" ListUsers
 DBDPrepareSQL "INSERT INTO user(username, password, password_salt) VALUES(%s, %s, %s)" InsertUser
 DBDPrepareSQL "SELECT id, password, password_salt from user where username = %s" HasUser
 DBDPrepareSQL "INSERT INTO login(username, selector, token) VALUES(%d, %s, %s)" BeginUserLogin
+DBDPrepareSQL "DELETE FROM login WHERE username = %s" EndUserLogin
 
 LoadFile /home/dafrito/src/parsegraph/parsegraph_login/src/.libs/libparsegraph_login.so
 LoadModule parsegraph_login_json_module /home/dafrito/src/parsegraph/parsegraph_server/mod_parsegraph_login_json.so
