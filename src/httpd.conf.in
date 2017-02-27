@@ -455,6 +455,7 @@ DBDPrepareSQL "SELECT id, username FROM user" parsegraph_login_listUsers
 DBDPrepareSQL "DELETE FROM user WHERE username = %s" parsegraph_login_removeUser
 DBDPrepareSQL "SELECT username FROM login WHERE selector = %s AND token = %s" parsegraph_login_refreshUserLogin
 
+LoadFile /home/dafrito/src/parsegraph/parsegraph_login/src/.libs/libparsegraph_login_httpd.so
 LoadFile /home/dafrito/src/parsegraph/parsegraph_login/src/.libs/libparsegraph_login.so
 LoadModule parsegraph_login_json_module /home/dafrito/src/parsegraph/parsegraph_server/mod_parsegraph_login_json.so
 <LocationMatch "^/userlogin/?$">
