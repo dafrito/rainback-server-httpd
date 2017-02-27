@@ -65,8 +65,11 @@ check_method_path() {
 
 # Run all tests.
 test_server() {
+    TEST_USERNAME="foofoob"
+    TEST_PASSWORD="foofoob"
+
     check_method_path GET '/'
-    check_method_path GET '/login'
+    check_method_path GET "/login?command=parsegraph_createNewUser&username=$TEST_USERNAME&password=$TEST_PASSWORD"
 }
 
 login_install $HOME/var/parsegraph/users.sqlite

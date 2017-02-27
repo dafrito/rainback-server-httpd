@@ -32,6 +32,7 @@ checkvalgrind: httpd.conf
 
 run: httpd.conf
 	test ! -e httpd.pid || exit 1
+	test -e mod_parsegraph_login_json.so || exit 1
 	httpd -f `pwd`/httpd.conf
 .PHONY: run
 

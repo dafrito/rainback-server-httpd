@@ -28,8 +28,8 @@
 # same ServerRoot for multiple httpd daemons, you will need to change at
 # least PidFile.
 #
-ServerRoot "@@PREFIX@@"
-PidFile "@@PREFIX@@/httpd.pid"
+ServerRoot "@PREFIX@"
+PidFile "@PREFIX@/httpd.pid"
 
 #
 # Listen: Allows you to bind Apache to specific IP addresses and/or
@@ -233,12 +233,12 @@ ServerName notimers.com
 # documents. By default, all requests are taken from this directory, but
 # symbolic links and aliases may be used to point to other locations.
 #
-DocumentRoot "@@PREFIX@@/www"
+DocumentRoot "@PREFIX@/public_html"
 
 #
-# Relax access to content within /var/www.
+# Relax access to content within /var/public_html.
 #
-<Directory "@@PREFIX@@/www">
+<Directory "@PREFIX@/public_html">
     AllowOverride None
     # Allow open access:
     Require all granted
@@ -286,7 +286,7 @@ DocumentRoot "@@PREFIX@@/www"
 # logged here.  If you *do* define an error logfile for a <VirtualHost>
 # container, that host's errors will be logged there and not here.
 #
-ErrorLog "@@PREFIX@@/error_log"
+ErrorLog "@PREFIX@/error_log"
 
 #
 # LogLevel: Control the number of messages logged to the error_log.
@@ -447,14 +447,21 @@ EnableSendfile on
 DBDriver sqlite3
 DBDParams /home/dafrito/var/parsegraph/users.sqlite
 
-DBDPrepareSQL "SELECT username, email from user" ListUsers
-DBDPrepareSQL "INSERT INTO user(username, password, password_salt) VALUES(%s, %s, %s)" InsertUser
-DBDPrepareSQL "SELECT id, password, password_salt from user where username = %s" HasUser
-DBDPrepareSQL "INSERT INTO login(username, selector, token) VALUES(%d, %s, %s)" BeginUserLogin
-DBDPrepareSQL "DELETE FROM login WHERE username = %s" EndUserLogin
+DBDPrepareSQL "SELECT id, password, password_salt FROM user WHERE username = %s" parsegraph_login_getUser
+DBDPrepareSQL "INSERT INTO user(username, password, password_salt) VALUES(%s, %s, %s)" parsegraph_login_createNewUser
+DBDPrepareSQL "INSERT INTO login(username, selector, token) VALUES(%s, %s, %s)" parsegraph_login_beginUserLogin
+DBDPrepareSQL "DELETE FROM login WHERE username = %s" parsegraph_login_endUserLogin
+DBDPrepareSQL "SELECT id, username FROM user" parsegraph_login_listUsers
+DBDPrepareSQL "DELETE FROM user WHERE username = %s" parsegraph_login_removeUser
+DBDPrepareSQL "SELECT username FROM login WHERE selector = %s AND token = %s" parsegraph_login_refreshUserLogin
 
 LoadFile /home/dafrito/src/parsegraph/parsegraph_login/src/.libs/libparsegraph_login.so
 LoadModule parsegraph_login_json_module /home/dafrito/src/parsegraph/parsegraph_server/mod_parsegraph_login_json.so
-<LocationMatch "^/login/?$">
+<LocationMatch "^/userlogin/?$">
 SetHandler parsegraph_login_json
+</LocationMatch>
+
+LoadModule parsegraph_index_html_module /home/dafrito/src/parsegraph/parsegraph_server/mod_parsegraph_index_html.so
+<LocationMatch "^/?$">
+SetHandler parsegraph_index_html
 </LocationMatch>

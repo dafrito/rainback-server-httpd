@@ -1,0 +1,17 @@
+#!/bin/bash
+
+PREFIX=${*-$HOME}
+
+rm -f Makefile
+cat Makefile.in >Makefile
+sed -i -r -e "s,@PREFIX@,$PREFIX,g" Makefile
+chmod 0400 Makefile
+
+rm -f config.status
+echo <<EOF >config.status
+#!/bin/bash
+
+./configure $PREFIX
+EOF
+chmod +x config.status
+chmod 0500 config.status
