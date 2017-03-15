@@ -5,6 +5,7 @@ httpd.conf: src/httpd.conf.in
 	rm -f $@
 	cp $< $@
 	sed -i -ri -e "s|[@]PREFIX[@]|`pwd`|g" $@
+	dir=`pwd`; dir=`dirname $$dir`; sed -i -ri -e "s|[@]PARSEGRAPHDIR[@]|$$dir|g" $@
 	chmod 0400 $@
 
 check: httpd.conf
@@ -32,6 +33,9 @@ checkvalgrind: httpd.conf
 
 run: httpd.conf
 	test ! -e httpd.pid || exit 1
+	test -e mod_parsegraph_user_html.so || exit 1
+	test -e mod_parsegraph_user_json.so || exit 1
+	test -e mod_parsegraph_index_html.so || exit 1
 	httpd -f `pwd`/httpd.conf
 .PHONY: run
 

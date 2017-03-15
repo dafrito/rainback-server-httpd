@@ -447,22 +447,23 @@ EnableSendfile on
 DBDriver sqlite3
 DBDParams /home/dafrito/var/parsegraph/users.sqlite
 
-DBDPrepareSQL "SELECT id, password, password_salt FROM user WHERE username = %s" parsegraph_login_getUser
-DBDPrepareSQL "INSERT INTO user(username, password, password_salt) VALUES(%s, %s, %s)" parsegraph_login_createNewUser
-DBDPrepareSQL "INSERT INTO login(username, selector, token) VALUES(%s, %s, %s)" parsegraph_login_beginUserLogin
-DBDPrepareSQL "DELETE FROM login WHERE username = %s" parsegraph_login_endUserLogin
-DBDPrepareSQL "SELECT id, username FROM user" parsegraph_login_listUsers
-DBDPrepareSQL "DELETE FROM user WHERE username = %s" parsegraph_login_removeUser
-DBDPrepareSQL "SELECT username FROM login WHERE selector = %s AND token = %s" parsegraph_login_refreshUserLogin
+DBDPrepareSQL "SELECT id, password, password_salt FROM user WHERE username = %s" parsegraph_user_getUser
+DBDPrepareSQL "INSERT INTO user(username, password, password_salt) VALUES(%s, %s, %s)" parsegraph_user_createNewUser
+DBDPrepareSQL "INSERT INTO login(username, selector, token) VALUES(%s, %s, %s)" parsegraph_user_beginUserLogin
+DBDPrepareSQL "DELETE FROM login WHERE username = %s" parsegraph_user_endUserLogin
+DBDPrepareSQL "SELECT id, username FROM user" parsegraph_user_listUsers
+DBDPrepareSQL "DELETE FROM user WHERE username = %s" parsegraph_user_removeUser
+DBDPrepareSQL "SELECT username FROM login WHERE selector = %s AND token = %s" parsegraph_user_refreshUserLogin
 
-LoadFile /home/dafrito/src/parsegraph/parsegraph_login/src/.libs/libparsegraph_login_httpd.so
-LoadFile /home/dafrito/src/parsegraph/parsegraph_login/src/.libs/libparsegraph_login.so
-LoadModule parsegraph_login_json_module /home/dafrito/src/parsegraph/parsegraph_server/mod_parsegraph_login_json.so
-<LocationMatch "^/userlogin/?$">
-SetHandler parsegraph_login_json
+LoadFile @PARSEGRAPHDIR@/user/src/.libs/libparsegraph_user_httpd.so
+LoadFile @PARSEGRAPHDIR@/user/src/.libs/libparsegraph_user.so
+LoadModule parsegraph_user_json_module @PARSEGRAPHDIR@/server/mod_parsegraph_user_json.so
+LoadModule parsegraph_user_html_module @PARSEGRAPHDIR@/server/mod_parsegraph_user_html.so
+<LocationMatch "^/user/?$">
+SetHandler parsegraph_user_html
 </LocationMatch>
 
-LoadModule parsegraph_index_html_module /home/dafrito/src/parsegraph/parsegraph_server/mod_parsegraph_index_html.so
+LoadModule parsegraph_index_html_module @PARSEGRAPHDIR@/server/mod_parsegraph_index_html.so
 <LocationMatch "^/?$">
 SetHandler parsegraph_index_html
 </LocationMatch>
