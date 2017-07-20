@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PREFIX=${*-$HOME}
+PREFIX=${*-`pwd`}
 
 rm -f Makefile
 cat Makefile.in >Makefile
