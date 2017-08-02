@@ -18,18 +18,18 @@
 # server as '/www/log/access_log', where as '/log/access_log' will be
 # interpreted as '/log/access_log'.
 
-<IfDefine Test>
-ServerRoot @PREFIX@
-</IfDefine>
-<IfDefine !Test>
-<IfDefine Development>
-ServerRoot @PREFIX@
-PidFile @PREFIX@/httpd.pid
-</IfDefine>
-<IfDefine !Development>
-Listen @IP@:443
-Listen @IP@:80
-</IfDefine>
+#
+# ServerRoot: The top of the directory tree under which the server's
+# configuration, error, and log files are kept.
+#
+# Do not add a slash at the end of the directory path.  If you point
+# ServerRoot at a non-local disk, be sure to specify a local disk on the
+# Mutex directive, if file-based mutexes are used.  If you wish to share the
+# same ServerRoot for multiple httpd daemons, you will need to change at
+# least PidFile.
+#
+ServerRoot "@PREFIX@"
+PidFile "@PREFIX@/httpd.pid"
 
 #
 # Listen: Allows you to bind Apache to specific IP addresses and/or
@@ -39,15 +39,8 @@ Listen @IP@:80
 # Change this to Listen on specific IP addresses as shown below to 
 # prevent Apache from glomming onto all bound IP addresses.
 #
-#Listen @IP@:80
-<IfDefine Development>
-Listen 127.0.0.1:8080
-</IfDefine>
-<IfDefine !Development>
-Listen @IP@:443
-Listen @IP@:80
-</IfDefine>
-</IfDefine>
+Listen 72.249.137.166:80
+Listen 72.249.137.166:443
 
 #
 # Dynamic Shared Object (DSO) Support
@@ -167,10 +160,7 @@ LoadModule proxy_http_module modules/mod_proxy_http.so
 LoadModule proxy_hcheck_module modules/mod_proxy_hcheck.so
 LoadModule proxy_scgi_module modules/mod_proxy_scgi.so
 LoadModule proxy_wstunnel_module modules/mod_proxy_wstunnel.so
-<IfDefine !Development>
-LoadModule ssl_module modules/mod_ssl.so
-Include /etc/httpd/conf.d/ssl.conf
-</IfDefine>
+#LoadModule ssl_module modules/mod_ssl.so
 LoadModule systemd_module modules/mod_systemd.so
 
 <IfModule mpm_worker_module>
@@ -190,14 +180,8 @@ LoadModule systemd_module modules/mod_systemd.so
 # It is usually good practice to create a dedicated user and group for
 # running httpd, as with most system services.
 #
-<IfDefine Development>
-User @USER@
-Group @USER@
-</IfDefine>
-<IfDefine !Development>
-User apache
-Group apache
-</IfDefine>
+User dafrito
+Group dafrito
 
 # 'Main' server configuration
 #
@@ -216,12 +200,7 @@ Group apache
 # e-mailed.  This address appears on some server-generated pages, such
 # as error documents.  e.g. admin@your-domain.com
 #
-<IfDefine Development>
 ServerAdmin dafrito@gmail.com
-</IfDefine>
-<IfDefine !Development>
-ServerAdmin admin@parsegraph.com
-</IfDefine>
 
 #
 # ServerName gives the name and port that the server uses to identify itself.
@@ -230,12 +209,7 @@ ServerAdmin admin@parsegraph.com
 #
 # If your host doesn't have a registered DNS name, enter its IP address here.
 #
-<IfDefine Development>
-ServerName localhost
-</IfDefine>
-<IfDefine !Development>
-ServerName parsegraph.com
-</IfDefine>
+ServerName notimers.com
 
 #
 # Deny access to the entirety of your server's filesystem. You must
@@ -259,18 +233,12 @@ ServerName parsegraph.com
 # documents. By default, all requests are taken from this directory, but
 # symbolic links and aliases may be used to point to other locations.
 #
-<IfDefine Development>
-DocumentRoot "@PARSEGRAPHDIR@/server/public_html"
-</IfDefine>
-<IfDefine !Development>
-DocumentRoot "/srv/html"
-</IfDefine>
+DocumentRoot "@PREFIX@/public_html"
 
 #
 # Relax access to content within /var/public_html.
 #
-<IfDefine Development>
-<Directory "@PARSEGRAPHDIR@/server/public_html">
+<Directory "@PREFIX@/public_html">
     AllowOverride None
     # Allow open access:
     Require all granted
@@ -288,29 +256,12 @@ DocumentRoot "/srv/html"
     # for more information.
     #
     Options Indexes FollowSymLinks
-</Directory>
-</IfDefine>
-<IfDefine !Development>
-<Directory "/srv/html">
-    AllowOverride None
-    # Allow open access:
-    Require all granted
 
     #
-    # Possible values for the Options directive are "None", "All",
-    # or any combination of:
-    #   Indexes Includes FollowSymLinks SymLinksifOwnerMatch ExecCGI MultiViews
+    # Controls who can get stuff from this server.
     #
-    # Note that "MultiViews" must be named *explicitly* --- "Options All"
-    # doesn't give it to you.
-    #
-    # The Options directive is both complicated and important.  Please see
-    # http://httpd.apache.org/docs/2.4/mod/core.html#options
-    # for more information.
-    #
-    Options Indexes FollowSymLinks
+    Require all granted
 </Directory>
-</IfDefine>
 
 #
 # DirectoryIndex: sets the file that Apache will serve if a directory
@@ -335,24 +286,14 @@ DocumentRoot "/srv/html"
 # logged here.  If you *do* define an error logfile for a <VirtualHost>
 # container, that host's errors will be logged there and not here.
 #
-<IfDefine Development>
 ErrorLog "@PREFIX@/error_log"
-</IfDefine>
-<IfDefine !Development>
-ErrorLog "logs/error_log"
-</IfDefine>
 
 #
 # LogLevel: Control the number of messages logged to the error_log.
 # Possible values include: debug, info, notice, warn, error, crit,
 # alert, emerg.
 #
-<IfDefine Development>
-LogLevel info
-</IfDefine>
-<IfDefine !Development>
 LogLevel warn
-</IfDefine>
 
 <IfModule log_config_module>
     #
@@ -380,12 +321,7 @@ LogLevel warn
     # If you prefer a logfile with access, agent, and referer information
     # (Combined Logfile Format) you can use the following directive.
     #
-    <IfDefine Development>
     CustomLog "access_log" combined
-    </IfDefine>
-    <IfDefine !Development>
-    CustomLog "logs/access_log" combined
-    </IfDefine>
 </IfModule>
 
 <IfModule alias_module>
@@ -509,12 +445,7 @@ AddDefaultCharset UTF-8
 EnableSendfile on
 
 DBDriver sqlite3
-<IfDefine Development>
 DBDParams /home/dafrito/var/parsegraph/users.sqlite
-</IfDefine>
-<IfDefine !Development>
-DBDParams /srv/parsegraph/users.sqlite
-</IfDefine>
 
 DBDPrepareSQL "SELECT id, password, password_salt, profile FROM user WHERE username = %s" parsegraph_user_getUser
 DBDPrepareSQL "INSERT INTO user(username, password, password_salt) VALUES(%s, %s, %s)" parsegraph_user_createNewUser
@@ -525,34 +456,18 @@ DBDPrepareSQL "DELETE FROM user WHERE username = %s" parsegraph_user_removeUser
 DBDPrepareSQL "SELECT username FROM login WHERE selector = %s AND token = %s" parsegraph_user_refreshUserLogin
 DBDPrepareSQL "UPDATE user SET profile = %pDt WHERE username = %s" parsegraph_user_setUserProfile
 
-<IfDefine Development>
 LoadFile @PARSEGRAPHDIR@/user/src/.libs/libparsegraph_user_httpd.so
 LoadFile @PARSEGRAPHDIR@/user/src/.libs/libparsegraph_user.so
 LoadModule parsegraph_user_json_module @PARSEGRAPHDIR@/server/mod_parsegraph_user_json.so
 LoadModule parsegraph_user_html_module @PARSEGRAPHDIR@/server/mod_parsegraph_user_html.so
-</IfDefine>
-<IfDefine !Development>
-LoadFile /usr/lib64/libparsegraph_user_httpd.so
-LoadFile /usr/lib64/libparsegraph_user.so
-LoadModule parsegraph_user_json_module modules/mod_parsegraph_user_json.so
-LoadModule parsegraph_user_html_module modules/mod_parsegraph_user_html.so
-</IfDefine>
-
 <LocationMatch "^/user/?$">
 SetHandler parsegraph_user
 AllowMethods GET POST PUT DELETE
-SetOutputFilter DEFLATE
 </LocationMatch>
 
-<IfDefine Development>
 LoadModule parsegraph_index_html_module @PARSEGRAPHDIR@/server/mod_parsegraph_index_html.so
-</IfDefine>
-<IfDefine !Development>
-LoadModule parsegraph_index_html_module modules/mod_parsegraph_index_html.so
-</IfDefine>
 <LocationMatch "^/?$">
 SetHandler parsegraph_index_html
-SetOutputFilter DEFLATE
 </LocationMatch>
 
 DBDPrepareSQL "INSERT INTO list_item(value) VALUES(%s)" parsegraph_List_new
@@ -576,90 +491,22 @@ DBDPrepareSQL "DELETE FROM list_item WHERE id = %d" parsegraph_List_destroyItem
 DBDPrepareSQL "SELECT id, next, prev, value, type FROM list_item WHERE list_id = %d" parsegraph_List_listItems
 DBDPrepareSQL "SELECT COUNT(*) from list_item WHERE list_id IS %d" parsegraph_List_length
 DBDPrepareSQL "SELECT list_id FROM list_item WHERE id = %d" parsegraph_List_getListId
-DBDPrepareSQL "UPDATE user SET is_super_admin = 1 WHERE username = %s" parsegraph_user_grantSuperadmin
-DBDPrepareSQL "UPDATE user SET is_super_admin = 0 WHERE username = %s" parsegraph_user_revokeSuperadmin
-DBDPrepareSQL "UPDATE user SET is_banned = 1 WHERE username = %s" parsegraph_user_banUser
-DBDPrepareSQL "UPDATE user SET is_banned = 0 WHERE username = %s" parsegraph_user_unbanUser
-DBDPrepareSQL "UPDATE user SET allow_subscription = 1 WHERE username = %s" parsegraph_user_allowSubscription
-DBDPrepareSQL "UPDATE user SET allow_subscription = 0 WHERE username = %s" parsegraph_user_disallowSubscription
-DBDPrepareSQL "SELECT allow_subscription FROM user WHERE username = %s" parsegraph_user_allowsSubscription
-DBDPrepareSQL "SELECT is_banned FROM user WHERE username = %s" parsegraph_user_isBanned
-DBDPrepareSQL "SELECT is_super_admin FROM user WHERE username = %s" parsegraph_user_hasSuperadmin
 
-DBDPrepareSQL "INSERT INTO environment(environment_guid, for_new_users, for_administrators, create_date, open_to_public, open_for_visits, open_for_modification, visit_count, owner, root_list_id, environment_type_id) VALUES(lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-' || lower(hex(randomblob(2))) || '-' || lower(hex(randomblob(2))) || '-' || lower(hex(randomblob(6))), 0, 0, strftime('%%Y-%%m-%%dT%%H:%%M:%%f', 'now'), 0, 0, 0, 0, %d, %d, %d)" parsegraph_Environment_createEnvironment
-DBDPrepareSQL "DELETE FROM environment WHERE environment_guid = %s" parsegraph_Environment_destroyEnvironment
-DBDPrepareSQL "SELECT last_insert_rowid();" parsegraph_Environment_last_insert_rowid
-DBDPrepareSQL "SELECT environment_guid FROM environment WHERE environment_id = %d" parsegraph_Environment_getEnvironmentGUIDForId
-DBDPrepareSQL "SELECT online_environment_id FROM login WHERE selector = %s AND token = %s" parsegraph_Environment_getOnlineEnvironment
-DBDPrepareSQL "SELECT environment_id FROM environment WHERE environment_guid = %s" parsegraph_Environment_getEnvironmentIdForGUID
-DBDPrepareSQL "SELECT environment_title FROM environment WHERE environment_guid = %s" parsegraph_Environment_getEnvironmentTitleForGUID
-DBDPrepareSQL "SELECT environment_title FROM environment WHERE environment_id = %d" parsegraph_Environment_getEnvironmentTitleForId
-DBDPrepareSQL "SELECT environment_guid, environment_title FROM saved_environment JOIN environment ON saved_environment.environment_id = environment.environment_id WHERE user_id = %d ORDER by save_date DESC" parsegraph_Environment_getSavedEnvironmentsForUser
-DBDPrepareSQL "INSERT INTO saved_environment(environment_id, user_id, save_date, client_state) VALUES(%d, %d, datetime('now'), %s)" parsegraph_Environment_saveEnvironment
-DBDPrepareSQL "SELECT environment_guid, environment_title FROM environment WHERE owner = %d ORDER by create_date DESC" parsegraph_Environment_getOwnedEnvironmentsForUser
-
-<IfDefine Development>
 LoadFile @PARSEGRAPHDIR@/list/src/.libs/libparsegraph_List.so
 LoadModule parsegraph_List_json_module @PARSEGRAPHDIR@/server/mod_parsegraph_List_json.so
-</IfDefine>
-<IfDefine !Development>
-LoadFile /usr/lib64/libparsegraph_List.so
-LoadModule parsegraph_List_json_module modules/mod_parsegraph_List_json.so
-</IfDefine>
-
 <LocationMatch "^/list/?$">
 SetHandler parsegraph_List
 AllowMethods GET POST PUT DELETE
 </LocationMatch>
 
-<IfDefine Development>
-LoadFile @PARSEGRAPHDIR@/environment/src/.libs/libparsegraph_environment.so
-LoadModule parsegraph_environment_html_module @PARSEGRAPHDIR@/server/mod_parsegraph_environment_html.so
-</IfDefine>
-<IfDefine !Development>
-LoadFile /usr/lib64/libparsegraph_environment.so
-LoadModule parsegraph_environment_html_module modules/mod_parsegraph_environment_html.so
-</IfDefine>
-
-<LocationMatch "^/[-0-9a-f]{36}$">
-SetHandler parsegraph_environment
-AllowMethods GET POST PUT DELETE
-SetOutputFilter DEFLATE
-</LocationMatch>
-
-<LocationMatch "^/environment/?$">
-SetHandler parsegraph_environment
-AllowMethods GET POST PUT DELETE
-SetOutputFilter DEFLATE
-</LocationMatch>
-
-<LocationMatch "^/environment/[-0-9a-f]{36}$">
-SetHandler parsegraph_environment_guid
-AllowMethods GET POST PUT DELETE
-SetOutputFilter DEFLATE
-</LocationMatch>
-
-<LocationMatch "^/tag/.*$">
-SetHandler parsegraph_environment
-AllowMethods GET POST PUT DELETE
-SetOutputFilter DEFLATE
-</LocationMatch>
-
 ProxyRequests off
 
-<LocationMatch "^/environment/live?$">
-ProxyPass "ws://localhost:7681/environment/live"
-ProxyPassReverse "ws://localhost:7681/environment/live"
+<LocationMatch "^/camera/?$">
+	ProxyPass "ws://localhost:7681/camera/"
+	ProxyPassReverse "ws://localhost:7681/camera/"
 </LocationMatch>
 
-<LocationMatch "\.js$">
-	SetOutputFilter DEFLATE
-</LocationMatch>
-
-<LocationMatch "\.html$">
-	SetOutputFilter DEFLATE
-</LocationMatch>
-
-<LocationMatch "^/UnicodeData.txt$">
-	SetOutputFilter DEFLATE
+<LocationMatch "^/chat/?$">
+	ProxyPass "ws://localhost:7681/chat/"
+	ProxyPassReverse "ws://localhost:7681/chat/"
 </LocationMatch>

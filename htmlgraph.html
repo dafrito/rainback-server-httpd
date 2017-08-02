@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>HTML - Parsegraph</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="../parsegraph/parsegraph-1.0.js"></script>
+<script>
+{
+function graphDocument(graph, doc)
+{
+    var cdir = parsegraph_DOWNWARD;
+    var rdir = parsegraph_FORWARD;
+    var car = new parsegraph_Caret('bu');
+
+    var traversal = new parsegraph_DepthTraversal(doc);
+    var visitor = function(node, levelState) {
+        if(!node) {
+            // Leaving a node.
+            car.pop();
+            car.pull(rdir);
+            //car.align(rdir, parsegraph_ALIGN_CENTER);
+            car.shrink(rdir);
+            return;
+        }
+
+        var sdir = rdir;
+        if(!levelState) {
+            car.push();
+            levelState = true;
+        }
+        else {
+            sdir = cdir;
+        }
+
+        // Visit the node for real.
+        switch(node.nodeType) {
+        case Node.ELEMENT_NODE:
+            car.spawnMove(sdir, 's');
+            car.label(node.tagName);
+
+            if(node.attributes && node.attributes.length > 0) {
+                for(var i = 0; i < node.attributes.length; ++i) {
+                    if(i === 0) {
+                        car.push();
+                        car.align('i', 'vertical');
+                        car.spawnMove('i', 'bu');
+                        car.shrink();
+                    }
+                    else {
+                        car.spawnMove('d', 'bu');
+                    }
+                    var attr = node.attributes[i];
+                    car.push();
+                    car.spawnMove('f', 'b');
+                    car.label(attr.nodeName);
+                    car.spawnMove('f', 'b');
+                    car.label(attr.value);
+                    car.pop();
+                }
+                car.pop();
+            }
+            break;
+        case Node.DOCUMENT_TYPE_NODE:
+            car.spawnMove(sdir, 's');
+            car.label("!DOCTYPE");
+            break;
+        case Node.TEXT_NODE:
+            car.spawnMove(sdir, 'b');
+            car.label(node.nodeValue);
+
+            car.onClick(function() {
+                node.parentNode.removeChild(node);
+            });
+            break;
+        default:
+            car.spawnMove(sdir, 's');
+            var nodeLabel = node.nodeType;
+            switch(node.nodeType) {
+            case Node.COMMENT_NODE:
+                nodeLabel = "COMMENT_NODE";
+                break;
+            case Node.ENTITY_NODE:
+                nodeLabel = "ENTITY_NODE";
+                break;
+            case Node.DOCUMENT_FRAGMENT_NODE:
+                nodeLabel = "DOCUMENT_FRAGMENT_NODE";
+                break;
+            case Node.DOCUMENT_NODE:
+                nodeLabel = "DOCUMENT_NODE";
+                break;
+            }
+            car.label(nodeLabel);
+            break;
+        }
+
+        return levelState;
+    };
+
+    traversal.visit(visitor, this);
+    while(traversal.canVisit()) {
+        traversal.visit(visitor, this);
+    }
+
+    return car.root();
+}
+
+var output;
+var graph;
+var renderTimer;
+function init(main)
+{
+    // Create the surface.
+    var surface = new parsegraph_Surface();
+    main.appendChild(surface.container());
+
+    output = document.createElement("iframe");
+    main.appendChild(output);
+
+    graph = new parsegraph_Graph(surface);
+    GRAPH = graph;
+
+    var cameraName = "parsegraph_htmlgraph_camera";
+    if(localStorage.getItem(cameraName) != null) {
+        try {
+            //var storedCamera = JSON.parse(localStorage.getItem(cameraName));
+            //graph.camera().restore(storedCamera);
+        } catch(e) {
+            console.log("Failed to parse saved camera state for '" + cameraName + "'.\n" + parsegraph_writeError(e));
+        }
+    }
+
+    // Schedule the repaint.
+    renderTimer = new parsegraph_AnimationTimer();
+    document.domain = document.domain;
+    var oldDocument = output.contentDocument;
+    renderTimer.setListener(function() {
+        graph.input().Update(new Date());
+        if(graph.needsRepaint()) {
+            surface.paint(50);
+        }
+        surface.render();
+        if(graph.input().UpdateRepeatedly() || graph.needsRepaint()) {
+            renderTimer.schedule();
+        }
+    });
+    graph.input().SetListener(function(affectedPaint) {
+        if(affectedPaint) {
+            graph.scheduleRepaint();
+        }
+        renderTimer.schedule();
+    });
+    renderTimer.schedule();
+    graph.onScheduleRepaint = function() {
+        renderTimer.schedule();
+    };
+
+    // Retrieve the initial HTML content.
+    output.src = "initial.html";
+
+    surface.addRenderer(function() {
+        //localStorage.setItem(cameraName, JSON.stringify(graph.camera().toJSON()));
+    });
+}
+
+parsegraph_addEventListener(window, "message", function(event) {
+    var origin = event.origin || event.originalEvent.origin;
+    if(origin !== "http://localhost") {
+          return;
+    }
+    if(event.data !== "DOMContentLoaded") {
+        return;
+    }
+    graph.plot(graphDocument(graph, output.contentDocument));
+    graph.scheduleRepaint();
+}, false);
+
+document.addEventListener("DOMContentLoaded", function(event) {
+    try {
+        parsegraph_initialize();
+        init(document.body);
+    } catch(ex) {
+        alert("Init: " + parsegraph_writeError(ex));
+        throw ex;
+    }
+}, false);
+} // Init block
+</script>
+<style>
+body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+}
+
+.parsegraph_Surface {
+    width: 100%;
+    height: 100vh;
+    margin: 0;
+}
+
+.controls {
+    margin: auto;
+    position: absolute;
+    pointer-events: none;
+    width: 100%;
+}
+
+.controls > form button {
+    pointer-events: auto;
+}
+
+body > div:nth-child(1) {
+    float: left; width: 50%; height: 100%; background: blue;
+}
+
+body > div:nth-child(2) {
+    float: right; width: 50%; height: 100%; background: #eee;
+}
+
+body > iframe {
+    display: block;
+    width: 50%;
+    border: 0;
+}
+
+@media only screen and (max-width: 980px) {
+
+.controls {
+    display: none;
+}
+
+body > div {
+    width: 100%;
+}
+
+body > div input {
+    clear: left;
+}
+
+}
+</style>
+</head>
+<body>
+</body>
+</html>

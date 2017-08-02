@@ -1,7 +1,7 @@
 USER=$(shell whoami)
 UID=$(shell id -u `whoami`)
 GID=$(shell id -g `whoami`)
-PREFIX=@PREFIX@
+PREFIX=/home/dafrito/src/parsegraph/server
 PACKAGE_NAME=parsegraph_server_config
 PACKAGE_VERSION=1
 PACKAGE_RELEASE=1

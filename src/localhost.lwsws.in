@@ -1,0 +1,31 @@
+{
+ "vhosts": [ {
+     "name": "localhost",
+     "port": "7681",
+     "interface": "lo",
+#     "host-ssl-key":  "@SSL_CertificateKeyFile@",
+#     "host-ssl-cert": "@SSL_CertificateFile@",
+#     "host-ssl-ca":   "@SSL_CertificateFile@",
+     "access-log": "@PREFIX@/access-log-lwsws",
+#     "sts": "on",
+
+     "mounts": [
+       {
+        "mountpoint": "/environment/live",
+        "origin": "callback://parsegraph-environment-protocol"
+       }
+     ],
+
+     # which protocols are enabled for this vhost, and optional
+     # vhost-specific config options for the protocol
+     #
+     "ws-protocols": [{
+       "parsegraph-environment-protocol": {
+         "status": "ok",
+         "db_path": "/home/dafrito/var/parsegraph/users.sqlite"
+       }
+     }]
+    }
+  ]
+}
+

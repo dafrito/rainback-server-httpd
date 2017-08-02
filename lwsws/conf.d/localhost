@@ -1,0 +1,31 @@
+{
+ "vhosts": [ {
+     "name": "localhost",
+     "port": "7681",
+     "interface": "lo",
+#     "host-ssl-key":  "/etc/letsencrypt/live/parsegraph.com/privkey.pem",
+#     "host-ssl-cert": "/etc/letsencrypt/live/parsegraph.com/fullchain.pem",
+#     "host-ssl-ca":   "/etc/letsencrypt/live/parsegraph.com/fullchain.pem",
+     "access-log": "/home/dafrito/src/parsegraph/server/access-log-lwsws",
+#     "sts": "on",
+
+     "mounts": [
+       {
+        "mountpoint": "/environment/live",
+        "origin": "callback://parsegraph-environment-protocol"
+       }
+     ],
+
+     # which protocols are enabled for this vhost, and optional
+     # vhost-specific config options for the protocol
+     #
+     "ws-protocols": [{
+       "parsegraph-environment-protocol": {
+         "status": "ok",
+         "db_path": "/home/dafrito/var/parsegraph/users.sqlite"
+       }
+     }]
+    }
+  ]
+}
+
