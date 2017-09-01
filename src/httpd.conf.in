@@ -557,7 +557,7 @@ SetOutputFilter DEFLATE
 
 DBDPrepareSQL "INSERT INTO list_item(value) VALUES(%s)" parsegraph_List_new
 DBDPrepareSQL "SELECT id from list_item WHERE list_id IS NULL AND value = %s" parsegraph_List_getID
-DBDPrepareSQL "SELECT value from list_item WHERE id = %d" parsegraph_List_getName
+DBDPrepareSQL "SELECT value,type from list_item WHERE id = %d" parsegraph_List_getName
 DBDPrepareSQL "DELETE FROM list_item WHERE list_id IS NULL AND id = %d" parsegraph_List_destroy
 DBDPrepareSQL "INSERT INTO list_item(list_id, type, value, prev, next) VALUES(%d, %d, %s, NULL, NULL)" parsegraph_List_newItem
 DBDPrepareSQL "SELECT last_insert_rowid()" parsegraph_List_getLastId
@@ -576,6 +576,11 @@ DBDPrepareSQL "DELETE FROM list_item WHERE id = %d" parsegraph_List_destroyItem
 DBDPrepareSQL "SELECT id, next, prev, value, type FROM list_item WHERE list_id = %d" parsegraph_List_listItems
 DBDPrepareSQL "SELECT COUNT(*) from list_item WHERE list_id IS %d" parsegraph_List_length
 DBDPrepareSQL "SELECT list_id FROM list_item WHERE id = %d" parsegraph_List_getListId
+DBDPrepareSQL "UPDATE list_item SET next = NULL WHERE id = %d" parsegraph_List_clearNext
+DBDPrepareSQL "UPDATE list_item SET prev = NULL WHERE id = %d" parsegraph_List_clearPrev
+DBDPrepareSQL "UPDATE list_item SET value = %s WHERE id = %d" parsegraph_List_setValue
+DBDPrepareSQL "UPDATE list_item SET type = %d WHERE id = %d" parsegraph_List_setType
+DBDPrepareSQL "UPDATE list_item SET list_id = %d WHERE list_id = %d" parsegraph_List_reparentItems
 DBDPrepareSQL "UPDATE user SET is_super_admin = 1 WHERE username = %s" parsegraph_user_grantSuperadmin
 DBDPrepareSQL "UPDATE user SET is_super_admin = 0 WHERE username = %s" parsegraph_user_revokeSuperadmin
 DBDPrepareSQL "UPDATE user SET is_banned = 1 WHERE username = %s" parsegraph_user_banUser
@@ -597,6 +602,10 @@ DBDPrepareSQL "SELECT environment_title FROM environment WHERE environment_id = 
 DBDPrepareSQL "SELECT environment_guid, environment_title FROM saved_environment JOIN environment ON saved_environment.environment_id = environment.environment_id WHERE user_id = %d ORDER by save_date DESC" parsegraph_Environment_getSavedEnvironmentsForUser
 DBDPrepareSQL "INSERT INTO saved_environment(environment_id, user_id, save_date, client_state) VALUES(%d, %d, datetime('now'), %s)" parsegraph_Environment_saveEnvironment
 DBDPrepareSQL "SELECT environment_guid, environment_title FROM environment WHERE owner = %d ORDER by create_date DESC" parsegraph_Environment_getOwnedEnvironmentsForUser
+DBDPrepareSQL "UPDATE login SET online_environment_id = %d WHERE selector = %s AND token = %s" parsegraph_Environment_enterEnvironment
+DBDPrepareSQL "UPDATE login SET online_environment_id = NULL WHERE selector = %s AND token = %s" parsegraph_Environment_leaveEnvironment
+DBDPrepareSQL "SELECT root_list_id FROM environment WHERE environment_guid = %s" parsegraph_Environment_getEnvironmentRoot
+DBDPrepareSQL "UPDATE environment SET root_list_id = %d WHERE environment_guid = %s" parsegraph_Environment_setEnvironmentRoot
 
 <IfDefine Development>
 LoadFile @PARSEGRAPHDIR@/list/src/.libs/libparsegraph_List.so
@@ -647,7 +656,7 @@ SetOutputFilter DEFLATE
 
 ProxyRequests off
 
-<LocationMatch "^/environment/live?$">
+<LocationMatch "^/environment/live/?$">
 ProxyPass "ws://localhost:7681/environment/live"
 ProxyPassReverse "ws://localhost:7681/environment/live"
 </LocationMatch>

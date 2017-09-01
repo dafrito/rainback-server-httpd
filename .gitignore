@@ -5,3 +5,5 @@ actual.html
 httpd.pid
 mod_*.so
 public_html
+lwsws.pid
+lwsws/plugins/*

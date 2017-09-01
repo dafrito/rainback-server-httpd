@@ -42,7 +42,7 @@ test: httpd.conf
 	httpd -DDevelopment -X -f `pwd`/httpd.conf
 .PHONY: test
 
-VALGRIND = valgrind -v --num-callers=40 --leak-check=full --trace-children=yes
+VALGRIND = valgrind -v --num-callers=40 --leak-check=full --trace-children=no
 
 checkvalgrind: httpd.conf
 	$(VALGRIND) /usr/sbin/httpd -DDevelopment -X -f `pwd`/httpd.conf
@@ -91,8 +91,10 @@ debug: httpd.conf lwsws/conf lwsws/conf.d/localhost
 	test -e mod_parsegraph_user_json.so || exit 1
 	test -e mod_parsegraph_List_json.so || exit 1
 	test -e mod_parsegraph_index_html.so || exit 1
+	#tmux -S $(PREFIX)/lwsws.tmux new-s -d lwsws --configdir $(PREFIX)/lwsws -d 6
+	#gdb httpd -ex "r -X -DDevelopment -f `pwd`/httpd.conf"
 	httpd -DDevelopment -f `pwd`/httpd.conf
-	gdb lwsws -ex "r --configdir $(PREFIX)/lwsws -d 6"
+	gdb lwsws -ex "b parsegraph_environment_ws.c:406" -ex "r --configdir $(PREFIX)/lwsws -d 6"
 .PHONY: debug
 
 valgrind: httpd.conf lwsws/conf lwsws/conf.d/localhost
@@ -102,6 +104,8 @@ valgrind: httpd.conf lwsws/conf lwsws/conf.d/localhost
 	test -e mod_parsegraph_user_json.so || exit 1
 	test -e mod_parsegraph_List_json.so || exit 1
 	test -e mod_parsegraph_index_html.so || exit 1
+	#tmux -S $(PREFIX)/lwsws.tmux new-s -d lwsws --configdir $(PREFIX)/lwsws -d 6
+	#$(VALGRIND) httpd -X -DDevelopment -f `pwd`/httpd.conf
 	httpd -DDevelopment -f `pwd`/httpd.conf
 	$(VALGRIND) lwsws --configdir $(PREFIX)/lwsws -d 6
 .PHONY: valgrind
