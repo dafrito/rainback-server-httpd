@@ -1,21 +1,15 @@
 {
  "vhosts": [ {
-     "name": "localhost",
+     "name": "127.0.0.1",
      "port": "7681",
      "interface": "lo",
-#     "host-ssl-key":  "@SSL_CertificateKeyFile@",
-#     "host-ssl-cert": "@SSL_CertificateFile@",
-#     "host-ssl-ca":   "@SSL_CertificateFile@",
      "access-log": "@PREFIX@/access-log-lwsws",
-#     "sts": "on",
-
      "mounts": [
        {
         "mountpoint": "/environment/live",
         "origin": "callback://parsegraph-environment-protocol"
        }
      ],
-
      # which protocols are enabled for this vhost, and optional
      # vhost-specific config options for the protocol
      #

@@ -4,11 +4,11 @@
 
 {
   "global": {
-	"uid":@UID@,
-	"gid":@GID@,
+  "uid":@UID@,
+  "gid":@GID@,
    "interface": "lo",
    "count-threads": "1",
-   "server-string": "lwsws",
+   "server-string": "parsegraph.com",
    "ws-pingpong-secs": "200",
    "init-ssl": "no",
    "plugin-dir":"@PREFIX@/lwsws/plugins"
