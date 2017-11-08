@@ -3,8 +3,8 @@ UID=$(shell id -u `whoami`)
 GID=$(shell id -g `whoami`)
 PREFIX=/home/dafrito/src/parsegraph/server
 PACKAGE_NAME=parsegraph_server_config
-PACKAGE_VERSION=1
-PACKAGE_RELEASE=1
+PACKAGE_VERSION=2.1
+PACKAGE_RELEASE=8
 PACKAGE_SUMMARY=Server configuration for parsegraph
 PACKAGE_DESCRIPTION=Server configuration for parsegraph
 PACKAGE_URL=parsegraph.com
@@ -168,7 +168,7 @@ $(PACKAGE_NAME)-$(PACKAGE_VERSION).tar.gz: httpd.conf lwsws/conf.d/localhost lws
 dist-gzip: $(PACKAGE_NAME)-$(PACKAGE_VERSION).tar.gz $(PACKAGE_NAME).spec
 .PHONY: dist-gzip
 
-rpm: rpm.sh dist-gzip
+rpm: rpm.sh $(PACKAGE_NAME).spec dist-gzip
 	bash $<
 .PHONY: rpm
 
