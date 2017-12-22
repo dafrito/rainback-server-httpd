@@ -15,7 +15,10 @@ SSL_CertificateFile=$(SSL_ROOT_DIR)/fullchain.pem
 SSL_CertificateKeyFile=$(SSL_ROOT_DIR)/privkey.pem
 SSL_CertificateChainFile=$(SSL_ROOT_DIR)/fullchain.pem
 
-build: $(PACKAGE_NAME).spec httpd.conf lwsws/conf lwsws/conf.d/localhost rpm.sh
+PORT=443
+BACKEND_PORT=8081
+
+build: $(PACKAGE_NAME).spec httpd.conf rpm.sh
 .PHONY: build
 
 HTTPD='httpd -DDevelopment -f `pwd`/httpd.conf'
@@ -23,7 +26,6 @@ HTTPD='httpd -DDevelopment -f `pwd`/httpd.conf'
 httpd.conf: src/httpd.conf.in
 	rm -f $@
 	cp $< $@
-	sed -i -ri -e "s|[@]IP[@]|72.249.137.166|g" $@
 	sed -i -ri -e "s|[@]PREFIX[@]|$(PREFIX)|g" $@
 	sed -i -ri -e "s|[@]USER[@]|$(USER)|g" $@
 	dir=`pwd`; dir=`dirname $$dir`; sed -i -ri -e "s|[@]PARSEGRAPHDIR[@]|$$dir|g" $@
@@ -48,98 +50,79 @@ checkvalgrind: httpd.conf
 	$(VALGRIND) /usr/sbin/httpd -DDevelopment -X -f `pwd`/httpd.conf
 .PHONY: checkvalgrind
 
-lwsws/conf.d/localhost: src/localhost.lwsws.in
-lwsws/conf: src/lwsws.conf.in
-	cp -f $< $@-wip
-	sed -ri -e "s|[@]USER[@]|$(USER)|g" $@-wip
-	sed -ri -e "s|[@]UID[@]|$(UID)|g" $@-wip
-	sed -ri -e "s|[@]GID[@]|$(GID)|g" $@-wip
-	sed -ri -e "s|[@]PREFIX[@]|$(PREFIX)|g" $@-wip
-	chmod 0400 $@-wip
-	mv -f $@-wip $@
-
-lwsws/conf.d/localhost: src/localhost.lwsws.in
-	cp -f $< $@-wip
-	sed -ri -e "s|[@]UID[@]|$(UID)|g" $@-wip
-	sed -ri -e "s|[@]GID[@]|$(GID)|g" $@-wip
-	sed -ri -e "s|[@]PREFIX[@]|$(PREFIX)|g" $@-wip
-	sed -ri -e "s|[@]SSL_CertificateFile[@]|$(SSL_CertificateFile)|g" $@-wip
-	sed -ri -e "s|[@]SSL_CertificateKeyFile[@]|$(SSL_CertificateKeyFile)|g" $@-wip
-	sed -ri -e "s|[@]SSL_CertificateChainFile[@]|$(SSL_CertificateChainFile)|g" $@-wip
-	chmod 0400 $@-wip
-	mv -f $@-wip $@
-
-run: httpd.conf lwsws/conf lwsws/conf.d/localhost
+run: httpd.conf
 	test ! -e httpd.pid || (! pgrep httpd) || exit 1
-	test ! -e lwsws.pid || (! pgrep lwsws) || exit 1
+	#test ! -e rainback.pid || (! pgrep rainback) || exit 1
 	test -e mod_parsegraph_user_html.so || exit 1
 	test -e mod_parsegraph_user_json.so || exit 1
 	test -e mod_parsegraph_List_json.so || exit 1
 	test -e mod_parsegraph_index_html.so || exit 1
 	httpd -DDevelopment -f `pwd`/httpd.conf
-	tmux -S $(PREFIX)/lwsws.tmux new-s -d lwsws --configdir $(PREFIX)/lwsws -d 6
+	#tmux -S $(PREFIX)/rainback.tmux new-s -d rainback $(PORT) $(BACKEND_PORT)
 .PHONY: run
 
 tmux:
-	tmux -S $(PREFIX)/lwsws.tmux attach
+	tmux -S $(PREFIX)/rainback.tmux attach
 .PHONY: tmux
 
-debug: httpd.conf lwsws/conf lwsws/conf.d/localhost
+debug: httpd.conf
 	test ! -e httpd.pid || (! pgrep httpd) || exit 1
-	test ! -e lwsws.pid || (! pgrep lwsws) || exit 1
+	test ! -e rainback.pid || (! pgrep rainback) || exit 1
 	test -e mod_parsegraph_user_html.so || exit 1
 	test -e mod_parsegraph_user_json.so || exit 1
 	test -e mod_parsegraph_List_json.so || exit 1
 	test -e mod_parsegraph_index_html.so || exit 1
-	#tmux -S $(PREFIX)/lwsws.tmux new-s -d lwsws --configdir $(PREFIX)/lwsws -d 6
+	#tmux -S $(PREFIX)/rainback.tmux new-s -d rainback $(PORT) $(BACKEND_PORT)
 	#gdb httpd -ex "r -X -DDevelopment -f `pwd`/httpd.conf"
 	httpd -DDevelopment -f `pwd`/httpd.conf
-	gdb lwsws -ex "b parsegraph_environment_ws.c:406" -ex "r --configdir $(PREFIX)/lwsws -d 6"
+	#gdb rainback -ex "b parsegraph_environment_ws.c:406" -ex "r"
 .PHONY: debug
 
-valgrind: httpd.conf lwsws/conf lwsws/conf.d/localhost
+valgrind: httpd.conf
 	test ! -e httpd.pid || (! pgrep httpd) || exit 1
-	test ! -e lwsws.pid || (! pgrep lwsws) || exit 1
+	test ! -e rainback.pid || (! pgrep rainback) || exit 1
 	test -e mod_parsegraph_user_html.so || exit 1
 	test -e mod_parsegraph_user_json.so || exit 1
 	test -e mod_parsegraph_List_json.so || exit 1
 	test -e mod_parsegraph_index_html.so || exit 1
-	#tmux -S $(PREFIX)/lwsws.tmux new-s -d lwsws --configdir $(PREFIX)/lwsws -d 6
+	#tmux -S $(PREFIX)/rainback.tmux new-s -d rainback $(PORT) $(BACKEND_PORT)
 	#$(VALGRIND) httpd -X -DDevelopment -f `pwd`/httpd.conf
 	httpd -DDevelopment -f `pwd`/httpd.conf
-	$(VALGRIND) lwsws --configdir $(PREFIX)/lwsws -d 6
+	#$(VALGRIND) rainback $(PORT) $(BACKEND_PORT)
 .PHONY: valgrind
 
-strace: httpd.conf lwsws/conf lwsws/conf.d/localhost
+strace: httpd.conf
 	test ! -e httpd.pid || (! pgrep httpd) || exit 1
-	test ! -e lwsws.pid || (! pgrep lwsws) || exit 1
+	#test ! -e rainback.pid || (! pgrep rainback) || exit 1
 	test -e mod_parsegraph_user_html.so || exit 1
 	test -e mod_parsegraph_user_json.so || exit 1
 	test -e mod_parsegraph_List_json.so || exit 1
 	test -e mod_parsegraph_index_html.so || exit 1
 	httpd -DDevelopment -f `pwd`/httpd.conf
-	strace -f lwsws --configdir $(PREFIX)/lwsws -d 6
+	strace -f rainback $(PORT) $(BACKEND_PORT)
 .PHONY: debug
 
 pgrep:
-	tmux -S $(PREFIX)/lwsws.tmux list-s; true
-	pgrep -l httpd; pgrep -l lwsws; true
+	tmux -S $(PREFIX)/rainbakc.tmux list-s; true
+	pgrep -l httpd; pgrep -l rainback; true
 .PHONY: pgrep
 
 massacre:
-	tmux -S $(PREFIX)/lwsws.tmux kill-session || true
-	pkill -9 lwsws; pkill -9 httpd; true
+	tmux -S $(PREFIX)/rainback.tmux kill-session || true
+	pkill -9 rainback; pkill -9 httpd; true
 .PHONY: massacre
 
-stop kill: httpd.pid lwsws.pid
-	kill -28 `cat httpd.pid`
-	TOKILL=$$(ps -q `cat lwsws.pid` --no-headers -o '%P'); test -n "$$TOKILL" && kill -9 $$TOKILL
-	kill -9 `cat lwsws.pid`
+stop kill:
+	test ! -e httpd.pid || kill -28 `cat httpd.pid`
+	#test ! -e rainback.pid || ( \
+	#TOKILL=$$(ps -q `cat rainback.pid` --no-headers -o '%P'); test -n "$$TOKILL" && kill -9 $$TOKILL; \
+	#kill -9 `cat rainback.pid`; \
+	#);
 .PHONY: stop kill
 
 clean:
 	test ! -e httpd.pid
-	rm -f httpd.pid httpd.conf lwsws/conf lwsws/conf.d/localhost $(PACKAGE_NAME)-$(PACKAGE_VERSION)-$(PACKAGE_RELEASE).src.rpm rpm.sh $(PACKAGE_NAME).spec $(PACKAGE_NAME)-$(PACKAGE_VERSION).tar.gz $(PACKAGE_NAME)-*.rpm
+	rm -f httpd.pid httpd.conf $(PACKAGE_NAME)-$(PACKAGE_VERSION)-$(PACKAGE_RELEASE).src.rpm rpm.sh $(PACKAGE_NAME).spec $(PACKAGE_NAME)-$(PACKAGE_VERSION).tar.gz $(PACKAGE_NAME)-*.rpm
 .PHONY: clean
 
 rpm.sh: rpm.sh.in
@@ -162,7 +145,7 @@ $(PACKAGE_NAME).spec: rpm.spec.in
 	mv $@-wip $@
 	chmod +x $@
 
-$(PACKAGE_NAME)-$(PACKAGE_VERSION).tar.gz: httpd.conf lwsws/conf.d/localhost lwsws/conf
+$(PACKAGE_NAME)-$(PACKAGE_VERSION).tar.gz: httpd.conf
 	tar --transform="s'^'$(PACKAGE_NAME)-$(PACKAGE_VERSION)/'g" -cz -f $@ $^
 
 dist-gzip: $(PACKAGE_NAME)-$(PACKAGE_VERSION).tar.gz $(PACKAGE_NAME).spec
