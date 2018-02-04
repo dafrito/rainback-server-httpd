@@ -6,7 +6,7 @@ mkdir -p $RPMDIR
 cd $RPMDIR && mkdir -p SOURCES SPECS BUILD RPMS SRPMS && cd -
 
 RPMFLAGS=--ba
-SRCRPM=parsegraph_server_config-2.1-8.src.rpm
+SRCRPM=parsegraph_server_config-2.1-9.src.rpm
 SPECFILE=parsegraph_server_config.spec
 
 make dist-gzip
@@ -19,4 +19,4 @@ for package in `rpm -q --specfile $SPECFILE`; do
     filename="$RPMDIR/RPMS/$arch/$package.rpm";
     [ -L ../rpm/`basename $filename` ] || ln -v -s $filename ../rpm/`basename $filename`;
 done
-[ -L ../rpm/$SRCRPM ] || ln -v -s $RPMDIR/SRPMS/parsegraph_server_config-2.1-8`rpmbuild -E '%{?dist}' $SPECFILE`.src.rpm ../rpm/$SRCRPM
+[ -L ../rpm/$SRCRPM ] || ln -v -s $RPMDIR/SRPMS/parsegraph_server_config-2.1-9`rpmbuild -E '%{?dist}' $SPECFILE`.src.rpm ../rpm/$SRCRPM

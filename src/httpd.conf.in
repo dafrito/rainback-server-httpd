@@ -18,8 +18,14 @@
 # server as '/www/log/access_log', where as '/log/access_log' will be
 # interpreted as '/log/access_log'.
 
+<IfDefine Development>
 ServerRoot @PREFIX@
 PidFile @PREFIX@/httpd.pid
+</IfDefine>
+<IfDefine !Development>
+ServerRoot /etc/httpd
+PidFile /var/run/parsegraph-httpd.pid
+</IfDefine>
 Listen 127.0.0.1:8081 http
 
 #
@@ -555,7 +561,6 @@ SetOutputFilter DEFLATE
 <LocationMatch "^/environment/?$">
 SetHandler parsegraph_environment
 AllowMethods GET POST PUT DELETE
-SetOutputFilter DEFLATE
 </LocationMatch>
 
 <LocationMatch "^/environment/[-0-9a-f]{36}$">
