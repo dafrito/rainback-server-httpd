@@ -182,7 +182,7 @@ ServerName rainback.com
 # symbolic links and aliases may be used to point to other locations.
 #
 <IfDefine Development>
-DocumentRoot "@PARSEGRAPHDIR@/server/public_html"
+DocumentRoot "@PARSEGRAPHDIR@/public_html"
 </IfDefine>
 <IfDefine !Development>
 DocumentRoot "/srv/html"
