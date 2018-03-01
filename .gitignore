@@ -8,3 +8,5 @@ public_html
 *.tar.gz
 Makefile
 *.pid
+rpm.sh
+*.spec

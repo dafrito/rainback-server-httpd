@@ -142,7 +142,7 @@ Group apache
 ServerAdmin dafrito@gmail.com
 </IfDefine>
 <IfDefine !Development>
-ServerAdmin admin@parsegraph.com
+ServerAdmin admin@rainback.com
 </IfDefine>
 
 #
@@ -156,7 +156,7 @@ ServerAdmin admin@parsegraph.com
 ServerName localhost
 </IfDefine>
 <IfDefine !Development>
-ServerName parsegraph.com
+ServerName rainback.com
 </IfDefine>
 
 #
@@ -429,151 +429,6 @@ AddDefaultCharset UTF-8
 #
 #EnableMMAP off
 EnableSendfile on
-
-DBDriver sqlite3
-<IfDefine Development>
-DBDParams /home/dafrito/var/parsegraph/users.sqlite
-</IfDefine>
-<IfDefine !Development>
-DBDParams /srv/parsegraph/users.sqlite
-</IfDefine>
-
-DBDPrepareSQL "SELECT id, password, password_salt, profile FROM user WHERE username = %s" parsegraph_user_getUser
-DBDPrepareSQL "INSERT INTO user(username, password, password_salt) VALUES(%s, %s, %s)" parsegraph_user_createNewUser
-DBDPrepareSQL "INSERT INTO login(username, selector, token) VALUES(%s, %s, %s)" parsegraph_user_beginUserLogin
-DBDPrepareSQL "DELETE FROM login WHERE username = %s" parsegraph_user_endUserLogin
-DBDPrepareSQL "SELECT id, username FROM user" parsegraph_user_listUsers
-DBDPrepareSQL "DELETE FROM user WHERE username = %s" parsegraph_user_removeUser
-DBDPrepareSQL "SELECT username FROM login WHERE selector = %s AND token = %s" parsegraph_user_refreshUserLogin
-DBDPrepareSQL "UPDATE user SET profile = %pDt WHERE username = %s" parsegraph_user_setUserProfile
-
-<IfDefine Development>
-LoadFile @PARSEGRAPHDIR@/user/src/.libs/libparsegraph_user_httpd.so
-LoadFile @PARSEGRAPHDIR@/user/src/.libs/libparsegraph_user.so
-LoadModule parsegraph_user_json_module @PARSEGRAPHDIR@/server/mod_parsegraph_user_json.so
-LoadModule parsegraph_user_html_module @PARSEGRAPHDIR@/server/mod_parsegraph_user_html.so
-</IfDefine>
-<IfDefine !Development>
-LoadFile /usr/lib64/libparsegraph_user_httpd.so
-LoadFile /usr/lib64/libparsegraph_user.so
-LoadModule parsegraph_user_json_module modules/mod_parsegraph_user_json.so
-LoadModule parsegraph_user_html_module modules/mod_parsegraph_user_html.so
-</IfDefine>
-
-<LocationMatch "^/user/?$">
-SetHandler parsegraph_user
-AllowMethods GET POST PUT DELETE
-SetOutputFilter DEFLATE
-</LocationMatch>
-
-<IfDefine Development>
-LoadModule parsegraph_index_html_module @PARSEGRAPHDIR@/server/mod_parsegraph_index_html.so
-</IfDefine>
-<IfDefine !Development>
-LoadModule parsegraph_index_html_module modules/mod_parsegraph_index_html.so
-</IfDefine>
-<LocationMatch "^/?$">
-SetHandler parsegraph_index_html
-SetOutputFilter DEFLATE
-</LocationMatch>
-
-DBDPrepareSQL "INSERT INTO list_item(value) VALUES(%s)" parsegraph_List_new
-DBDPrepareSQL "SELECT id from list_item WHERE list_id IS NULL AND value = %s" parsegraph_List_getID
-DBDPrepareSQL "SELECT value,type from list_item WHERE id = %d" parsegraph_List_getName
-DBDPrepareSQL "DELETE FROM list_item WHERE list_id IS NULL AND id = %d" parsegraph_List_destroy
-DBDPrepareSQL "INSERT INTO list_item(list_id, type, value, prev, next) VALUES(%d, %d, %s, NULL, NULL)" parsegraph_List_newItem
-DBDPrepareSQL "SELECT last_insert_rowid()" parsegraph_List_getLastId
-DBDPrepareSQL "UPDATE list_item SET next = %d WHERE list_id = %d and next IS NULL AND id IS NOT %d" parsegraph_List_append
-DBDPrepareSQL "UPDATE list_item SET prev = %d WHERE list_id = %d and prev IS NULL AND id IS NOT %d" parsegraph_List_prepend
-DBDPrepareSQL "DELETE FROM list_item WHERE list_id = %d" parsegraph_List_truncate
-DBDPrepareSQL "SELECT id FROM list_item WHERE list_id = %d and prev IS NULL" parsegraph_List_getHead
-DBDPrepareSQL "SELECT id FROM list_item WHERE list_id = %d and next IS NULL" parsegraph_List_getTail
-DBDPrepareSQL "UPDATE list_item SET prev = %d WHERE id = %d" parsegraph_List_setPrev
-DBDPrepareSQL "UPDATE list_item SET next = %d WHERE id = %d" parsegraph_List_setNext
-DBDPrepareSQL "SELECT next FROM list_item WHERE id = %d" parsegraph_List_getNext
-DBDPrepareSQL "SELECT prev FROM list_item WHERE id = %d" parsegraph_List_getPrev
-DBDPrepareSQL "UPDATE list_item SET type = %d, value = %s WHERE id = %d" parsegraph_List_updateItem
-DBDPrepareSQL "UPDATE list_item SET next = NULL, prev = NULL WHERE id = %d" parsegraph_List_removeItem
-DBDPrepareSQL "DELETE FROM list_item WHERE id = %d" parsegraph_List_destroyItem
-DBDPrepareSQL "SELECT id, next, prev, value, type FROM list_item WHERE list_id = %d" parsegraph_List_listItems
-DBDPrepareSQL "SELECT COUNT(*) from list_item WHERE list_id IS %d" parsegraph_List_length
-DBDPrepareSQL "SELECT list_id FROM list_item WHERE id = %d" parsegraph_List_getListId
-DBDPrepareSQL "UPDATE list_item SET next = NULL WHERE id = %d" parsegraph_List_clearNext
-DBDPrepareSQL "UPDATE list_item SET prev = NULL WHERE id = %d" parsegraph_List_clearPrev
-DBDPrepareSQL "UPDATE list_item SET value = %s WHERE id = %d" parsegraph_List_setValue
-DBDPrepareSQL "UPDATE list_item SET type = %d WHERE id = %d" parsegraph_List_setType
-DBDPrepareSQL "UPDATE list_item SET list_id = %d WHERE list_id = %d" parsegraph_List_reparentItems
-DBDPrepareSQL "UPDATE user SET is_super_admin = 1 WHERE username = %s" parsegraph_user_grantSuperadmin
-DBDPrepareSQL "UPDATE user SET is_super_admin = 0 WHERE username = %s" parsegraph_user_revokeSuperadmin
-DBDPrepareSQL "UPDATE user SET is_banned = 1 WHERE username = %s" parsegraph_user_banUser
-DBDPrepareSQL "UPDATE user SET is_banned = 0 WHERE username = %s" parsegraph_user_unbanUser
-DBDPrepareSQL "UPDATE user SET allow_subscription = 1 WHERE username = %s" parsegraph_user_allowSubscription
-DBDPrepareSQL "UPDATE user SET allow_subscription = 0 WHERE username = %s" parsegraph_user_disallowSubscription
-DBDPrepareSQL "SELECT allow_subscription FROM user WHERE username = %s" parsegraph_user_allowsSubscription
-DBDPrepareSQL "SELECT is_banned FROM user WHERE username = %s" parsegraph_user_isBanned
-DBDPrepareSQL "SELECT is_super_admin FROM user WHERE username = %s" parsegraph_user_hasSuperadmin
-
-DBDPrepareSQL "INSERT INTO environment(environment_guid, for_new_users, for_administrators, create_date, open_to_public, open_for_visits, open_for_modification, visit_count, owner, root_list_id, environment_type_id) VALUES(lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-' || lower(hex(randomblob(2))) || '-' || lower(hex(randomblob(2))) || '-' || lower(hex(randomblob(6))), 0, 0, strftime('%%Y-%%m-%%dT%%H:%%M:%%f', 'now'), 0, 0, 0, 0, %d, %d, %d)" parsegraph_Environment_createEnvironment
-DBDPrepareSQL "DELETE FROM environment WHERE environment_guid = %s" parsegraph_Environment_destroyEnvironment
-DBDPrepareSQL "SELECT last_insert_rowid();" parsegraph_Environment_last_insert_rowid
-DBDPrepareSQL "SELECT environment_guid FROM environment WHERE environment_id = %d" parsegraph_Environment_getEnvironmentGUIDForId
-DBDPrepareSQL "SELECT online_environment_id FROM login WHERE selector = %s AND token = %s" parsegraph_Environment_getOnlineEnvironment
-DBDPrepareSQL "SELECT environment_id FROM environment WHERE environment_guid = %s" parsegraph_Environment_getEnvironmentIdForGUID
-DBDPrepareSQL "SELECT environment_title FROM environment WHERE environment_guid = %s" parsegraph_Environment_getEnvironmentTitleForGUID
-DBDPrepareSQL "SELECT environment_title FROM environment WHERE environment_id = %d" parsegraph_Environment_getEnvironmentTitleForId
-DBDPrepareSQL "SELECT environment_guid, environment_title FROM saved_environment JOIN environment ON saved_environment.environment_id = environment.environment_id WHERE user_id = %d ORDER by save_date DESC" parsegraph_Environment_getSavedEnvironmentsForUser
-DBDPrepareSQL "INSERT INTO saved_environment(environment_id, user_id, save_date, client_state) VALUES(%d, %d, datetime('now'), %s)" parsegraph_Environment_saveEnvironment
-DBDPrepareSQL "SELECT environment_guid, environment_title FROM environment WHERE owner = %d ORDER by create_date DESC" parsegraph_Environment_getOwnedEnvironmentsForUser
-DBDPrepareSQL "UPDATE login SET online_environment_id = %d WHERE selector = %s AND token = %s" parsegraph_Environment_enterEnvironment
-DBDPrepareSQL "UPDATE login SET online_environment_id = NULL WHERE selector = %s AND token = %s" parsegraph_Environment_leaveEnvironment
-DBDPrepareSQL "SELECT root_list_id FROM environment WHERE environment_guid = %s" parsegraph_Environment_getEnvironmentRoot
-DBDPrepareSQL "UPDATE environment SET root_list_id = %d WHERE environment_guid = %s" parsegraph_Environment_setEnvironmentRoot
-
-<IfDefine Development>
-LoadFile @PARSEGRAPHDIR@/list/src/.libs/libparsegraph_List.so
-LoadModule parsegraph_List_json_module @PARSEGRAPHDIR@/server/mod_parsegraph_List_json.so
-</IfDefine>
-<IfDefine !Development>
-LoadFile /usr/lib64/libparsegraph_List.so
-LoadModule parsegraph_List_json_module modules/mod_parsegraph_List_json.so
-</IfDefine>
-
-<LocationMatch "^/list/?$">
-SetHandler parsegraph_List
-AllowMethods GET POST PUT DELETE
-</LocationMatch>
-
-<IfDefine Development>
-LoadFile @PARSEGRAPHDIR@/environment/src/.libs/libparsegraph_environment.so
-LoadModule parsegraph_environment_html_module @PARSEGRAPHDIR@/server/mod_parsegraph_environment_html.so
-</IfDefine>
-<IfDefine !Development>
-LoadFile /usr/lib64/libparsegraph_environment.so
-LoadModule parsegraph_environment_html_module modules/mod_parsegraph_environment_html.so
-</IfDefine>
-
-<LocationMatch "^/[-0-9a-f]{36}$">
-SetHandler parsegraph_environment
-AllowMethods GET POST PUT DELETE
-SetOutputFilter DEFLATE
-</LocationMatch>
-
-<LocationMatch "^/environment/?$">
-SetHandler parsegraph_environment
-AllowMethods GET POST PUT DELETE
-</LocationMatch>
-
-<LocationMatch "^/environment/[-0-9a-f]{36}$">
-SetHandler parsegraph_environment_guid
-AllowMethods GET POST PUT DELETE
-SetOutputFilter DEFLATE
-</LocationMatch>
-
-<LocationMatch "^/tag/.*$">
-SetHandler parsegraph_environment
-AllowMethods GET POST PUT DELETE
-SetOutputFilter DEFLATE
-</LocationMatch>
 
 <LocationMatch "\.js$">
 	SetOutputFilter DEFLATE
