@@ -53,10 +53,6 @@ checkvalgrind: httpd.conf
 run: httpd.conf
 	test ! -e httpd.pid || (! pgrep httpd) || exit 1
 	#test ! -e rainback.pid || (! pgrep rainback) || exit 1
-	test -e mod_parsegraph_user_html.so || exit 1
-	test -e mod_parsegraph_user_json.so || exit 1
-	test -e mod_parsegraph_List_json.so || exit 1
-	test -e mod_parsegraph_index_html.so || exit 1
 	httpd -DDevelopment -f `pwd`/httpd.conf
 	#tmux -S $(PREFIX)/rainback.tmux new-s -d rainback $(PORT) $(BACKEND_PORT)
 .PHONY: run
@@ -68,10 +64,6 @@ tmux:
 debug: httpd.conf
 	test ! -e httpd.pid || (! pgrep httpd) || exit 1
 	test ! -e rainback.pid || (! pgrep rainback) || exit 1
-	test -e mod_parsegraph_user_html.so || exit 1
-	test -e mod_parsegraph_user_json.so || exit 1
-	test -e mod_parsegraph_List_json.so || exit 1
-	test -e mod_parsegraph_index_html.so || exit 1
 	#tmux -S $(PREFIX)/rainback.tmux new-s -d rainback $(PORT) $(BACKEND_PORT)
 	#gdb httpd -ex "r -X -DDevelopment -f `pwd`/httpd.conf"
 	httpd -DDevelopment -f `pwd`/httpd.conf
@@ -81,10 +73,6 @@ debug: httpd.conf
 valgrind: httpd.conf
 	test ! -e httpd.pid || (! pgrep httpd) || exit 1
 	test ! -e rainback.pid || (! pgrep rainback) || exit 1
-	test -e mod_parsegraph_user_html.so || exit 1
-	test -e mod_parsegraph_user_json.so || exit 1
-	test -e mod_parsegraph_List_json.so || exit 1
-	test -e mod_parsegraph_index_html.so || exit 1
 	#tmux -S $(PREFIX)/rainback.tmux new-s -d rainback $(PORT) $(BACKEND_PORT)
 	#$(VALGRIND) httpd -X -DDevelopment -f `pwd`/httpd.conf
 	httpd -DDevelopment -f `pwd`/httpd.conf
@@ -94,10 +82,6 @@ valgrind: httpd.conf
 strace: httpd.conf
 	test ! -e httpd.pid || (! pgrep httpd) || exit 1
 	#test ! -e rainback.pid || (! pgrep rainback) || exit 1
-	test -e mod_parsegraph_user_html.so || exit 1
-	test -e mod_parsegraph_user_json.so || exit 1
-	test -e mod_parsegraph_List_json.so || exit 1
-	test -e mod_parsegraph_index_html.so || exit 1
 	httpd -DDevelopment -f `pwd`/httpd.conf
 	strace -f rainback $(PORT) $(BACKEND_PORT)
 .PHONY: debug
